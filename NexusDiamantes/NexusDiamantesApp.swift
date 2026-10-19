@@ -30,6 +30,8 @@ struct LaunchView: View {
             }
         }
         .preferredColorScheme(.dark)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .ignoresSafeArea(edges: .all)
         .onAppear {
             withAnimation(.spring(response: 0.9, dampingFraction: 0.62)) { logoScale = 1; glow = true }
             withAnimation(.easeInOut(duration: 1.5)) { progress = 1 }

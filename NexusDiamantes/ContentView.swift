@@ -100,6 +100,8 @@ struct ContentView: View {
             }
         }
         .tint(.cyan)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .ignoresSafeArea(edges: .all)
     }
 }
 
@@ -451,6 +453,8 @@ struct ProfileView: View {
             .padding(.vertical, 10)
             .background(.ultraThinMaterial)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .ignoresSafeArea(edges: .all)
         .onChange(of: photoItem) { item in Task { await loadPhoto(item) } }
         .preferredColorScheme(.dark)
     }
