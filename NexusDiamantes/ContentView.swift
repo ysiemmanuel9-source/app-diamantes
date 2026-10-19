@@ -136,17 +136,17 @@ struct StoreView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            Group {
-                switch tab {
-                case .inicio: home
-                case .paquetes: packagesPage
-                case .pedidos: OrdersView()
-                case .perfil:
-                    ProfileView(existing: profile) { updated in ProfileStore.save(updated); showingProfile = false }
-                }
+        Group {
+            switch tab {
+            case .inicio: home
+            case .paquetes: packagesPage
+            case .pedidos: OrdersView()
+            case .perfil:
+                ProfileView(existing: profile) { updated in ProfileStore.save(updated); showingProfile = false }
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .safeAreaInset(edge: .bottom, spacing: 0) {
             BottomBar(tab: $tab)
         }
         .preferredColorScheme(.dark)
@@ -154,7 +154,7 @@ struct StoreView: View {
 
     private var header: some View {
         HStack(spacing: 12) {
-            AnimatedDiamondLogo(size: 48)
+            NexusLogoView(size: 48)
             VStack(alignment: .leading, spacing: 2) {
                 Text("NEXUS").font(.caption.weight(.black)).tracking(3).foregroundStyle(.cyan)
                 Text("DIAMANTES").font(.headline.weight(.black)).tracking(1)
@@ -179,8 +179,11 @@ struct StoreView: View {
                 }
                 InfoCard()
             }
-            .padding(.horizontal, 18).padding(.top, 14).padding(.bottom, 24)
+            .frame(maxWidth: 640)
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, 16).padding(.top, 12).padding(.bottom, 30)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private var packagesPage: some View {
@@ -210,8 +213,11 @@ struct StoreView: View {
                     .padding(.vertical, 55)
                 }
             }
-            .padding(.horizontal, 18).padding(.top, 14).padding(.bottom, 24)
+            .frame(maxWidth: 640)
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, 16).padding(.top, 12).padding(.bottom, 30)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private func sectionTitle(_ title: String, action: String, actionHandler: @escaping () -> Void) -> some View {
@@ -236,6 +242,24 @@ struct AnimatedDiamondLogo: View {
             withAnimation(.linear(duration: 7).repeatForever(autoreverses: false)) { spin = true }
             withAnimation(.easeInOut(duration: 1.8).repeatForever(autoreverses: true)) { pulse = true }
         }
+    }
+}
+
+struct NexusLogoView: View {
+    let size: CGFloat
+    var body: some View {
+        Group {
+            if UIImage(named: "nexus-owl-logo") != nil {
+                Image("nexus-owl-logo").resizable().scaledToFill()
+            } else {
+                Image(systemName: "diamond.fill").font(.system(size: size * 0.42, weight: .bold)).foregroundStyle(.white)
+            }
+        }
+        .frame(width: size, height: size)
+        .background(.black)
+        .clipShape(RoundedRectangle(cornerRadius: size * 0.24))
+        .overlay(RoundedRectangle(cornerRadius: size * 0.24).stroke(.cyan.opacity(0.55), lineWidth: 2))
+        .shadow(color: .cyan.opacity(0.25), radius: 12)
     }
 }
 
@@ -297,7 +321,39 @@ struct BottomBar: View {
 
 struct OrdersView: View {
     @State private var orders = OrderStore.load()
-    var body: some View { ScrollView(showsIndicators: false) { VStack(alignment: .leading, spacing: 18) { Text("Mis pedidos").font(.system(size: 32, weight: .black, design: .rounded)); Text("Consulta aquí tus recargas realizadas desde esta app.").foregroundStyle(.secondary); if orders.isEmpty { VStack(spacing: 14) { Image(systemName: "clock.arrow.circlepath").font(.system(size: 42)).foregroundStyle(.cyan); Text("Todavía no hay pedidos").font(.title3.bold()); Text("Cuando prepares una compra aparecerá en esta sección.").multilineTextAlignment(.center).font(.subheadline).foregroundStyle(.secondary) }.frame(maxWidth: .infinity).padding(.vertical, 80) } else { ForEach(orders) { order in OrderRow(order: order) } } }.padding(18) }.onAppear { orders = OrderStore.load() } }
+    var body: some View {
+        ScrollView(showsIndicators: false) {
+            VStack(alignment: .leading, spacing: 18) {
+                HStack(spacing: 12) {
+                    NexusLogoView(size: 48)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("NEXUS").font(.caption.weight(.black)).tracking(3).foregroundStyle(.cyan)
+                        Text("PEDIDOS").font(.headline.weight(.black)).tracking(1)
+                    }
+                }
+                Text("Mis pedidos").font(.system(size: 32, weight: .black, design: .rounded))
+                Text("Consulta aquí tus recargas realizadas desde esta app.").foregroundStyle(.secondary)
+                if orders.isEmpty {
+                    VStack(spacing: 14) {
+                        Image(systemName: "clock.arrow.circlepath").font(.system(size: 42)).foregroundStyle(.cyan)
+                        Text("Todavía no hay pedidos").font(.title3.bold())
+                        Text("Cuando prepares una compra aparecerá en esta sección.").multilineTextAlignment(.center).font(.subheadline).foregroundStyle(.secondary)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 80)
+                } else {
+                    ForEach(orders) { order in OrderRow(order: order) }
+                }
+            }
+            .frame(maxWidth: 640)
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, 16)
+            .padding(.top, 16)
+            .padding(.bottom, 30)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .onAppear { orders = OrderStore.load() }
+    }
 }
 
 struct OrderRow: View {
@@ -309,19 +365,140 @@ struct ProfileView: View {
     let existing: LocalProfile?
     let onSave: (LocalProfile) -> Void
     @Environment(\.dismiss) private var dismiss
-    @State private var name: String; @State private var email: String; @State private var password = ""; @State private var avatar: Data?; @State private var photoItem: PhotosPickerItem?; @State private var error = ""
-    init(existing: LocalProfile?, onSave: @escaping (LocalProfile) -> Void) { self.existing = existing; self.onSave = onSave; _name = State(initialValue: existing?.name ?? ""); _email = State(initialValue: existing?.email ?? ""); _avatar = State(initialValue: existing?.avatar) }
-    var body: some View { ScrollView { VStack(spacing: 22) { if existing == nil { AnimatedDiamondLogo(size: 78); VStack(spacing: 7) { Text("Bienvenido a NEXUS").font(.system(size: 30, weight: .black, design: .rounded)); Text("Crea tu perfil para comenzar").foregroundStyle(.secondary) } } else { HStack { Text("Tu perfil").font(.system(size: 30, weight: .black, design: .rounded)); Spacer(); Button("Cerrar") { dismiss() }.foregroundStyle(.cyan) } }; VStack(spacing: 16) { AvatarView(data: avatar, size: 112); PhotosPicker(selection: $photoItem, matching: .images) { Label("Elegir foto de perfil", systemImage: "photo.on.rectangle") }.buttonStyle(.bordered); field("Nombre", icon: "person.fill", text: $name); field("Correo", icon: "envelope.fill", text: $email).keyboardType(.emailAddress).textInputAutocapitalization(.never); HStack { Image(systemName: "lock.fill").foregroundStyle(.cyan); SecureField(existing == nil ? "Contraseña (mínimo 6)" : "Nueva contraseña opcional", text: $password) }.padding(16).background(.white.opacity(0.08)).clipShape(RoundedRectangle(cornerRadius: 15)) }; if !error.isEmpty { Text(error).foregroundStyle(.red).font(.caption) }; Button { save() } label: { Text(existing == nil ? "Entrar a la tienda" : "Guardar cambios").font(.headline.bold()).frame(maxWidth: .infinity).padding(.vertical, 16) }.buttonStyle(.borderedProminent).tint(.cyan); Text("Tu perfil se guarda únicamente en este iPhone. No usamos Supabase ni login externo.").multilineTextAlignment(.center).font(.caption).foregroundStyle(.secondary) }.padding(22) }.onChange(of: photoItem) { item in Task { await loadPhoto(item) } }.preferredColorScheme(.dark) }
-    private func field(_ title: String, icon: String, text: Binding<String>) -> some View { HStack { Image(systemName: icon).foregroundStyle(.cyan); TextField(title, text: text) }.padding(16).background(.white.opacity(0.08)).clipShape(RoundedRectangle(cornerRadius: 15)) }
-    private func loadPhoto(_ item: PhotosPickerItem?) async { guard let item, let data = try? await item.loadTransferable(type: Data.self), let image = UIImage(data: data), let resized = image.jpegData(compressionQuality: 0.8) else { return }; await MainActor.run { avatar = resized } }
-    private func save() { guard !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, email.contains("@"), existing != nil || password.count >= 6 else { error = "Completa nombre, correo y una contraseña de mínimo 6 caracteres."; return }; let hash = password.isEmpty ? (existing?.passwordHash ?? "") : SHA256.hash(data: Data(password.utf8)).map { String(format: "%02x", $0) }.joined(); onSave(LocalProfile(name: name.trimmingCharacters(in: .whitespacesAndNewlines), email: email, passwordHash: hash, avatar: avatar)); dismiss() }
+    @State private var name: String
+    @State private var email: String
+    @State private var password = ""
+    @State private var avatar: Data?
+    @State private var photoItem: PhotosPickerItem?
+    @State private var error = ""
+
+    init(existing: LocalProfile?, onSave: @escaping (LocalProfile) -> Void) {
+        self.existing = existing
+        self.onSave = onSave
+        _name = State(initialValue: existing?.name ?? "")
+        _email = State(initialValue: existing?.email ?? "")
+        _avatar = State(initialValue: existing?.avatar)
+    }
+
+    var body: some View {
+        ZStack(alignment: .bottom) {
+            AppBackground()
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 18) {
+                    if existing == nil {
+                        NexusLogoView(size: 92)
+                        VStack(spacing: 5) {
+                            Text("Bienvenido a NEXUS").font(.system(size: 29, weight: .black, design: .rounded)).multilineTextAlignment(.center)
+                            Text("Crea tu perfil para comenzar").font(.subheadline).foregroundStyle(.secondary)
+                        }
+                    } else {
+                        HStack {
+                            Text("Tu perfil").font(.system(size: 30, weight: .black, design: .rounded))
+                            Spacer()
+                            Button("Cerrar") { dismiss() }.foregroundStyle(.cyan)
+                        }
+                    }
+
+                    VStack(spacing: 13) {
+                        AvatarView(data: avatar, size: 104)
+                        PhotosPicker(selection: $photoItem, matching: .images) {
+                            Label("Elegir foto de perfil", systemImage: "photo.on.rectangle")
+                                .font(.subheadline.weight(.bold))
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 12)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(.cyan)
+                        field("Nombre", icon: "person.fill", text: $name)
+                        field("Correo", icon: "envelope.fill", text: $email)
+                            .keyboardType(.emailAddress)
+                            .textInputAutocapitalization(.never)
+                        HStack(spacing: 10) {
+                            Image(systemName: "lock.fill").foregroundStyle(.cyan)
+                            SecureField(existing == nil ? "Contraseña (mínimo 6)" : "Nueva contraseña opcional", text: $password)
+                        }
+                        .padding(15)
+                        .background(.white.opacity(0.08))
+                        .clipShape(RoundedRectangle(cornerRadius: 15))
+                    }
+                    .padding(18)
+                    .background(.white.opacity(0.055))
+                    .clipShape(RoundedRectangle(cornerRadius: 24))
+                    .overlay(RoundedRectangle(cornerRadius: 24).stroke(.white.opacity(0.1)))
+
+                    if !error.isEmpty { Text(error).foregroundStyle(.red).font(.caption).multilineTextAlignment(.center) }
+                    Text("Tu perfil se guarda únicamente en este iPhone. No usamos Supabase ni login externo.")
+                        .multilineTextAlignment(.center).font(.caption).foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: 520)
+                .padding(.horizontal, 18)
+                .padding(.top, 24)
+                .padding(.bottom, 106)
+                .frame(maxWidth: .infinity)
+            }
+        }
+        .safeAreaInset(edge: .bottom) {
+            Button { save() } label: {
+                Text(existing == nil ? "Entrar a la tienda" : "Guardar cambios")
+                    .font(.headline.bold())
+                    .frame(maxWidth: 520)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 15)
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(.cyan)
+            .padding(.horizontal, 18)
+            .padding(.vertical, 10)
+            .background(.ultraThinMaterial)
+        }
+        .onChange(of: photoItem) { item in Task { await loadPhoto(item) } }
+        .preferredColorScheme(.dark)
+    }
+
+    private func field(_ title: String, icon: String, text: Binding<String>) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: icon).foregroundStyle(.cyan)
+            TextField(title, text: text)
+        }
+        .padding(15)
+        .background(.white.opacity(0.08))
+        .clipShape(RoundedRectangle(cornerRadius: 15))
+    }
+
+    private func loadPhoto(_ item: PhotosPickerItem?) async {
+        guard let item, let data = try? await item.loadTransferable(type: Data.self), let image = UIImage(data: data), let resized = image.jpegData(compressionQuality: 0.8) else { return }
+        await MainActor.run { avatar = resized }
+    }
+
+    private func save() {
+        guard !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, email.contains("@"), existing != nil || password.count >= 6 else {
+            error = "Completa nombre, correo y una contraseña de mínimo 6 caracteres."
+            return
+        }
+        let hash = password.isEmpty ? (existing?.passwordHash ?? "") : SHA256.hash(data: Data(password.utf8)).map { String(format: "%02x", $0) }.joined()
+        onSave(LocalProfile(name: name.trimmingCharacters(in: .whitespacesAndNewlines), email: email, passwordHash: hash, avatar: avatar))
+        dismiss()
+    }
 }
 
 struct AvatarView: View {
-    var profile: LocalProfile? = nil; var data: Data? = nil; let size: CGFloat
+    var profile: LocalProfile? = nil
+    var data: Data? = nil
+    let size: CGFloat
     init(profile: LocalProfile, size: CGFloat) { self.profile = profile; self.size = size }
     init(data: Data?, size: CGFloat) { self.data = data; self.size = size }
-    var body: some View { Group { if let imageData = data ?? profile?.avatar, let image = UIImage(data: imageData) { Image(uiImage: image).resizable().scaledToFill() } else { Text(String((profile?.name ?? "N").prefix(1)).uppercased()).font(.system(size: size * 0.38, weight: .black)).foregroundStyle(.white) } }.frame(width: size, height: size).background(LinearGradient(colors: [.cyan, .blue], startPoint: .topLeading, endPoint: .bottomTrailing)).clipShape(Circle()).overlay(Circle().stroke(.white.opacity(0.3), lineWidth: 2)) }
+    var body: some View {
+        Group {
+            if let imageData = data ?? profile?.avatar, let image = UIImage(data: imageData) {
+                Image(uiImage: image).resizable().scaledToFill()
+            } else {
+                NexusLogoView(size: size)
+            }
+        }
+        .frame(width: size, height: size)
+        .clipShape(Circle())
+        .overlay(Circle().stroke(.white.opacity(0.3), lineWidth: 2))
+    }
 }
 
 enum PaymentMethod: String, CaseIterable, Identifiable { case paypal = "PayPal"; case cashApp = "Cash App"; case zelle = "Zelle"; case whatsapp = "WhatsApp"; var id: String { rawValue } }

@@ -8,12 +8,14 @@
 /* Begin PBXBuildFile section */
 		A10000000000000000000001 /* NexusDiamantesApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000001 /* NexusDiamantesApp.swift */; };
 		A10000000000000000000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000002 /* ContentView.swift */; };
+		A10000000000000000000003 /* nexus-owl-logo.jpg in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000003 /* nexus-owl-logo.jpg */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		A20000000000000000000000 /* NexusDiamantes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NexusDiamantes.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A20000000000000000000001 /* NexusDiamantesApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NexusDiamantesApp.swift; sourceTree = "<group>"; };
 		A20000000000000000000002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		A20000000000000000000003 /* nexus-owl-logo.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = NexusDiamantes/Assets/nexus-owl-logo.jpg; sourceTree = "<group>"; };
 		A20000000000000000000004 /* NexusDiamantes */ = {isa = PBXFileReference; lastKnownFileType = folder; path = NexusDiamantes; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -22,7 +24,7 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		A40000000000000000000000 = {isa = PBXGroup; children = (A40000000000000000000001, A40000000000000000000002); sourceTree = "<group>"; };
+		A40000000000000000000000 = {isa = PBXGroup; children = (A40000000000000000000001, A40000000000000000000002, A20000000000000000000003); sourceTree = "<group>"; };
 		A40000000000000000000001 /* NexusDiamantes */ = {isa = PBXGroup; children = (A20000000000000000000001, A20000000000000000000002); path = NexusDiamantes; sourceTree = "<group>"; };
 		A40000000000000000000002 /* Products */ = {isa = PBXGroup; children = (A20000000000000000000000); name = Products; sourceTree = "<group>"; };
 /* End PBXGroup section */
@@ -36,7 +38,7 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		A30000000000000000000003 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+		A30000000000000000000003 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (A10000000000000000000003); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
